@@ -1,0 +1,5 @@
+# Cyclades multiport card hints
+hint.cy.0.at="isa"
+hint.cy.0.irq="10"
+hint.cy.0.maddr="0xd4000"
+hint.cy.0.msize="0x2000"
