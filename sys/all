@@ -1,0 +1,2 @@
+#!/bin/csh -f
+find . -name '*.[cshm]' -print | xargs egrep $argv[1]
