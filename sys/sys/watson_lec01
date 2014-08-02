@@ -1,0 +1,121 @@
+Robert N M Watson
+Computer Laboratory
+University of Cambridge
+
+It would be worth mentioning the dev/ tree -- multi-architecture device 
+drivers have been quietly migrating from pci/, etc, etc, to dev/ over time.
+
+- i386 Source-code Organization
+
+ 	cpufreq is the framework for lowering cpu frequency for
+ 	power-management purposes, not raising it, happily.
+
+- Network Source-code Organization
+
+ 	- Technically, netatalk is ethertalk, not appletalk, since it's
+ 	  over ethernet, not over localtalk or whatever it was.  Doesn't
+ 	  really matter. :-)
+
+ 	- netncp -- This is an RPC layer layered over netipx for Novell file
+ 	  system stuff.  This is the glue that lives between netipx and
+ 	  fs/nwfs and manages stateful connections with RPCs, etc, etc.
+
+ 	- The main difference between netatm and netnatm is that netnatm is a
+ 	  very thin shim around the ATM hardware, and netatm is a boatload of
+ 	  stuff.  It sounds like netatm is going away.  FWIW, we have another
+ 	  ATM pile'o'bits in netgraph/atm.
+
+ 	- netkey, netipsec, netinet6 -- scarily, we still have two IPSec
+ 	  stacks, Sam's stack ("FAST_IPSEC") and KAME IPSEC.  netipsec/ is
+ 	  Sam's IPSEC, netkey/ and netinet6/ contain KAME IPSEC stuff.
+
+ 	- netsmb -- this is the SMB RPC layer for fs/smbfs.  Samba is a user
+ 	  space implementation of an SMB server, whereas netmb and fs/smbfs
+ 	  are a kernel SMB client.  While related, they are different things.
+ 	  You can, in principle, mount_smbfs from your Windows box to your
+ 	  FreeBSD box to mount Windows file systems under FreeBSD over the
+ 	  network (or, for that matter, from Samba servers).
+
+- Other Architectures Source-code Organization
+
+ 	- At BSDCan this year, we toasted Alpha as of 7.0 and higher.
+ 	  Obviously, this is since your DVDs were made. :-)
+
+ 	- There's now an in-progress MIPS port.  Also since BSDCan.
+
+ 	- sparc64 has suddenly become more interesting thanks to sun4v, the
+ 	  heavily threaded Sun architecture of the day.  This is also quite
+ 	  recent, but it's neat to see FreeBSD booting on 32p systems.
+
+- Kernel-related source Code Organization
+
+ 	- modules/, in general, contains only the build infrastructure and no
+ 	  source code at all, in order to avoid code duplication.
+ 	  Increasingly, code is written so that it doesn't matter how it's
+ 	  built, and there's some hope in the future that we'll be able to
+ 	  link modules together to construct a kernel, but we're not there
+ 	  yet.  Some of the magic here is sysinit, since when we load modules
+ 	  we run their sysinits as needed, and if you pre-load a module before
+ 	  the kernel starts, it's basically indistinguishable from compiling
+ 	  it in.
+
+ 	- General comment on device drivers -- as time goes by, device drivers
+ 	  contain less and less architecture-specific code.  In part, this is
+ 	  because of the introduction of the busspace/busdma APIs, which
+ 	  abstract low level hardware access, but also because hardware
+ 	  architectures have increasingly standardized on ways to access and
+ 	  configure busses, and done so on a relatively small set of bus
+ 	  types.  This isn't true for all device drivers, but is actually true
+ 	  for a remarkable number.
+
+- Source code browsing
+
+ 	- It's worth mentioning that the _ leading variables is used to escape
+ 	  things so that they aren't in the application name space.
+ 	  Otherwise user variables, functions, types, etc, might conflict with
+ 	  system ones.
+
+ 	- "The option is always available" comment for INVARIANTS -- I believe
+ 	  this actually refers to the file being in opt_global.h, which is
+ 	  automatically included for all kernel files built, so INVARIANTS
+ 	  will always "be available" since the calling context doesn't need to
+ 	  do something like include opt_invariants.h or the like.
+
+ 	- p_fdtol is not what you think, it is worse.  When using linux-style
+ 	  threading (rfork, linux_clone, etc), advisory file locks have to be
+ 	  held by a particular process, so p_fdtol, I believe, providers owner
+ 	  information.  Or something along these lines.  The comment is poor
+ 	  and should be made more specific.
+
+ 	- p_flags vs p_sflags -- has to do with what locks the field.
+ 	  p_sflags is locked with the sched_lock, as it is a property of the
+ 	  scheduler, I believe.
+
+ 	- You talk about file systems not supporting locking, but I'm loosely
+ 	  under the impression that all file systems now do vnode locking.
+
+ 	- When covering buf.h, you talk about spl's still doing things on UP.
+ 	  I'm not sure that's true.  I think more likely the spl lines are
+ 	  present as a hint that things may not be properly locked, not
+ 	  because they do anything.  Also, you mention mutexes being no-ops on
+ 	  UP -- this is not the case.  However, you are right that in places
+ 	  we use critical sections for high speed single-processor
+ 	  synchronization.  For example, in malloc and UMA, we use critical
+ 	  sections to protect access to per-cpu stats and caches.  We've
+ 	  re-introduced soft critical sections, similar to soft spls, to avoid
+ 	  the overhead of disabling interrupts on some hardware (especially
+ 	  older Xeon P4's where it is ridiculously expensive because it enters
+ 	  microcode).  The aging Mach paper on soft interrupt disabling for
+ 	  optimistic purposes applies entirely.
+
+ 	- so_head is a pointer to the listen socket, I've updated the comment
+ 	  on it to be a little more clear (s/accept/listen).
+
+ 	- FYI, the packet zone is a UMA zone cache for mbufs + clusters
+ 	  together.  I believe the EXT_ flag is so that mbuma knows how to
+ 	  free it best into the right cache.
+
+ 	- FYI, jail is actually not implemented as a MAC policy, although
+ 	  largely for historical reasons.  There are jail-like policies
+ 	  though, and at least one third party has a MAC policy that augments
+ 	  the native jail policy.

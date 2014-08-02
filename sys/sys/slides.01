@@ -1,0 +1,292 @@
+.\" groff -U -s -p -t -rn1 -rp1 -rT1 ~mckusick/foils/macros slides.01 | lpr -Pmkm
+.\"
+.ds CH
+.nr PI 0.25i
+\&
+.sp |1i
+.ce 100
+\fBFreeBSD Kernel Internals:
+An Intensive Code Walkthrough\fP
+.sp 4
+Brought to you by
+.sp 1
+Dr. Marshall Kirk McKusick
+.sp 4
+Hillside Club
+Berkeley, California
+.sp 1
+March 18 \- July 2, 2009
+.sp 4
+Copyright \(co 2009 by Marshall Kirk McKusick
+.br
+All Rights Reserved.
+.ce 0
+.bp
+.TL "Kernel Source-code Organization"
+.sp 2
+.NP 0
+The kernel is made up of several large generic parts:
+.sp 1
+.BP 1
+sys \- main kernel header files
+.sp 1
+.BP 1
+kern \- kernel functions
+.BP 2
+system startup
+.BP 2
+syscall dispatching, entry points
+.BP 2
+process management
+.BP 2
+scheduling
+.BP 2
+signals and job control
+.BP 2
+descriptor handling and generic I/O
+.BP 2
+filesystem management
+.BP 2
+interprocess communication (sockets)
+.BP 2
+terminal handling
+.sp 1
+.BP 1
+vm \- virtual memory management
+.bp
+.TL "Filesystem Source-code Organization"
+.sp 1
+.BP 0
+ufs \- local filesystems composed of
+.BP 1
+ufs \- common local filesystem routines
+.BP 1
+ffs \- fast filesystem
+.sp 0.5
+.BP 0
+nfs \- NFS common routines
+.BP 0
+nfsclient \- NFS version 3 client support
+.BP 0
+nfsserver \- NFS version 3 server support
+.BP 0
+nfs4client \- NFS version 4 client support
+.BP 0
+nlm \- network lock manager
+.sp 0.5
+.BP 0
+fs \- other filesystems (partial list)
+.BP 1
+cd9660 \- ISO CDROM filesystem
+.BP 1
+msdosfs \- MS/DOS filesystem
+.BP 1
+ntfs \- Windows NT filesystem
+.BP 1
+tmpfs \- memory-based filesystem
+.BP 1
+smbfs \- Samba filesystem
+.BP 1
+procfs \- process info filesystem
+.BP 1
+unionfs \- union filesystem
+.bp
+.TL "Driver and Support Source-code Organization"
+.sp 1
+.BP 0
+cam \- mach-indep SCSI-driver support
+.BP 0
+dev \- machine-independent driver support
+.BP 0
+geom \- storage-device management support
+.BP 0
+isa \- machine-independent ISA drivers
+.BP 0
+legacy \- machine-independent legacy drivers
+.BP 0
+pci \- machine-independent PCI drivers
+.sp 1
+.BP 0
+bsm \- basic security module (BSM) audit
+.BP 0
+kgssapi \- generic security services (GSS)
+.BP 0
+crypto \- mainline cryptography code
+.BP 0
+opencrypto \- OpenBSD cryptography code
+.BP 0
+security - mandatory-access control (MAC) policy implementations
+.sp 1
+.BP 0
+libkern \- 64-bit, string, and other support routines from the C-library
+.BP 0
+rpc \- remote procedure call (RPC) routines
+.BP 0
+xdr \- external data representation for RPC
+.bp
+.TL "Networking Source-code Organization"
+.sp 1
+.NP 0
+The networking code is organized by protocol:
+.sp 0.5
+.BP 1
+net \- routing and generic interface drivers
+.BP 1
+netinet \- Internet protocols (TCP, UDP, IP, ICMP, etc)
+.BP 1
+netinet6 \- Version 6 Internet protocols (aka IPv6)
+.BP 1
+netgraph \- network protocol glue
+.BP 1
+netsmb \- SAMBA RPC layer
+.BP 1
+netipsec \- Leffler's fast IP security
+.BP 1
+netkey \- historic KAME IP security
+.BP 1
+net80211 \- wireless networking
+.BP 1
+netatalk \- Apple ethertalk networking
+.BP 1
+netatm \- Thick ATM networking
+.BP 1
+netnatm \- Thin ATM networking
+.BP 1
+netipx \- Novell IPX/SPX networking
+.BP 1
+netncp \- RPC layer over netipx for Novell filesystem
+.bp
+.TL "i386 Source-code Organization"
+.sp 0.5
+.NP 0
+The i386 machine directory is subdivided by function:
+.sp 0.25
+.BP 1
+include \- exported mach-dep header files
+.BP 1
+i386 \- machine-dependent support code and private header files
+.BP 1
+pci \- PCI device drivers
+.BP 1
+isa \- ISA device drivers
+.BP 1
+bios \- BIOS access routines (power management, etc)
+.BP 1
+acpica - ACPIC power management
+.BP 1
+cpufreq - lower CPU speed to save power
+.BP 1
+linux \- emulation for Linux system calls
+.BP 1
+ibcs2 \- SCO emulation support
+.BP 1
+svr4 \- System V interface emulation
+.BP 1
+xbox \- support to run on XBox
+.BP 1
+xen \- XEN host virtual-machine support
+.BP 1
+conf \- configuration files
+.BP 1
+compile \- area to compile i386 kernels
+.bp
+.TL "Other Architectures Source-code Organization"
+.sp 2
+.BP 1
+amd64 \- AMD64 processor family
+.sp 0.5
+.BP 1
+arm \- ARM processor family
+.sp 0.5
+.BP 1
+ia64 \- Intel IA64 processor family
+.sp 0.5
+.BP 1
+mips \- MIPS processor family
+.sp 0.5
+.BP 1
+pc98 \- Japanese PC98 Intel derivative
+.sp 0.5
+.BP 1
+powerpc \- IBM PowerPC processor family
+.sp 0.5
+.BP 1
+sparc64 \- Sun Sparc64 processor family
+.sp 0.5
+.BP 1
+sun4v \- Sun Fire T1000/T2000 servers
+.bp
+.TL "Kernel-related Source-code Organization"
+.sp 0.5
+.NP 0
+Other kernel related directories:
+.sp 0.25
+.BP 1
+boot \- mach-indep standalone boot code
+.BP 1
+conf \- mach-indep configuration files
+.BP 1
+modules \- loadable kernel modules
+.BP 1
+tools \- scripts for building kernel configuration files
+.BP 1
+xen \- XEN host virtual-machine support
+.sp 0.75
+.BP 1
+ddb \- in-kernel debugger
+.BP 1
+gdb \- external gdb-based kernel debugger
+.sp 0.75
+.BP 1
+cddl \- ZFS and DTrace (Sun community license)
+.BP 1
+contrib \- kernel code with more restrictive licenses
+.BP 1
+gnu \- floating point emulation and Linux ext2fs filesystem (GPL license)
+.BP 1
+compat \- compatibility with older systems
+.BP 1
+posix4 \- Posix realtime interfaces
+.bp
+.TL "Kernel I/O Structure"
+.sp 2
+.NP 0
+.po -0.5i
+.so ../../foils/freebsdint/Pic/iostruc.fig
+.po +0.5i
+.bp
+.TL "BSD Process Structure"
+.sp 1
+.NP 0
+.ev 1
+.so ../../foils/freebsdint/Pic/procstate.fig
+.ev
+.sp 0.5
+.BP 1
+Process structures dynamically allocated, placed on linked list;
+per-user resource limit plus per-system limit (changeable)
+.sp 0.25
+.BP 1
+Process structure stores data common to all its threads
+.bp
+.TL "Process Group Structure"
+.sp 1
+.NP 0
+.po -0.25i
+.so ../../foils/freebsdint/Pic/pghash.pic
+.po +0.25i
+.bp
+.TL "Kernel I/O Structure"
+.sp 2
+.NP
+.so ../../foils/freebsdint/Pic/kernio.pic
+.bp
+.TL "Vnode Linkages"
+.NP 0
+.PSPIC ../../foils/freebsdint/Pic/vnodelink.ps
+.NP 0
+Key:
+.NP 1
+C \- Clean buffer
+.NP 1
+D \- Dirty buffer
